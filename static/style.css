@@ -1,0 +1,174 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Main Content Area */
+.main-content {
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center;     /* Center content vertically */
+    flex-direction: column;
+    padding: 20px;
+    flex-grow: 1;
+    background-color: #f9f9f9; /* Light gray background */
+    height: 100vh; /* Full height of the viewport */
+}
+
+/* Chatbox Styling */
+#chat_box {
+    width: 100%;
+    max-width: 600px; /* Centered chatbox with max width */
+    margin-bottom: 80px; /* Make space for the input box */
+    padding: 20px;
+    background-color: #e0e0e0; /* Slightly darker gray */
+    overflow-y: auto;
+    font-family: 'Arial', sans-serif;
+    color: #333; /* Dark gray for text */
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+}
+
+/* Chat Message Styling */
+.message {
+    margin: 10px 0;
+    padding: 12px 20px;
+    border-radius: 20px;
+    max-width: 80%; /* Increased width for better visibility */
+    display: inline-block;
+    word-wrap: break-word;
+    position: relative;
+    line-height: 1.5;
+}
+
+/* User's Message Styling (Align left) */
+.message.user-message {
+    background-color: #b0bec5; /* Soft blue-gray */
+    color: black;
+    text-align: left;
+    border-radius: 20px 20px 0 20px;
+    margin-left: 15px;
+}
+
+/* AI's Message Styling (Align right) */
+.message.ai-message {
+    background-color: #cfd8dc; /* Light gray-blue */
+    color: black;
+    text-align: right;
+    border-radius: 20px 20px 20px 0;
+    margin-right: 15px;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    font-size: 1rem;
+    color: #90a4ae; /* Neutral gray */
+    text-align: center;
+    margin: 15px auto;
+    display: none;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 3px;
+    background-color: #90a4ae;
+    border-radius: 50%;
+    animation: typing 1.5s infinite;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+/* Animation for the typing indicator */
+@keyframes typing {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Input Field - Positioned at the bottom */
+.input-container {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center;     /* Center content vertically */
+    padding: 10px 20px;
+    z-index: 1000;
+    background-color: #ffffff;
+    border-top: 1px solid #ccc;
+}
+
+/* Input Field Styling */
+.input-container input[type="text"] {
+    width: 80%;
+    max-width: 500px; /* Limit max width of the input */
+    padding: 10px;
+    background-color: #f1f1f1; /* Light gray for the input */
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    font-size: 1rem;
+    margin-right: 10px; /* Space between input and button */
+}
+
+/* Button Styling */
+.input-container button {
+    background-color: #90a4ae; /* Neutral gray */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Change button color on hover */
+.input-container button:hover {
+    background-color: #78909c; /* Slightly darker gray on hover */
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .input-container input[type="text"] {
+        width: 70%; /* Make input field smaller */
+    }
+
+    .input-container button {
+        padding: 8px 12px;
+    }
+}
+
+/* Mobile Chatbox Adjustments */
+@media (max-width: 480px) {
+    .message {
+        max-width: 80%; /* Increase width of chat bubbles */
+    }
+
+    .message.user-message,
+    .message.ai-message {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .input-container {
+        padding: 8px 15px;
+    }
+}
