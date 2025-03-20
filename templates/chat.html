@@ -4,13 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Chat{% endblock %}</title>
-
-    <!-- Link to the style.css file -->
     <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
-
 </head>
 <body>
-
     {% block header %}
     <header>
         <h1>Bradley Bot</h1>
@@ -18,25 +14,15 @@
     {% endblock %}
 
     {% block content %}
-    <!-- Chatbox Styled to Look Like a Mobile Chat -->
     <div id="chat_box" class="chat-box">
-        <!-- Display the previous chat history -->
         {% for msg in chat_history %}
             <div class="message {% if msg.sender == 'Me' %}user-message{% else %}bradley-message{% endif %}">
                 <strong>{% if msg.sender == 'Me' %}You:{% else %}Bradley:{% endif %}</strong>
-                <div class="message-content">
-                    {{ msg.message }}
-                </div>
+                <div class="message-content">{{ msg.message }}</div>
             </div>
         {% endfor %}
     </div>
 
-    <!-- Typing indicator (initially hidden) -->
-    <div class="typing-indicator" style="display: none;">
-        <span></span><span></span><span></span>
-    </div>
-
-    <!-- Input Container - Positioned at the bottom -->
     <form method="post" onsubmit="event.preventDefault(); sendMessage();" class="input-container">
         <div>
             <input type="text" id="user_input" placeholder="Type your message..." required>
@@ -48,53 +34,68 @@
         async function sendMessage() {
             let userInput = document.getElementById("user_input").value;
             let chatBox = document.getElementById("chat_box");
-            let typingIndicator = document.querySelector(".typing-indicator");
 
-            // Display the user's message immediately in the chat box with "You" as the name
+            // Display user's message
             chatBox.innerHTML += ` 
                 <div class="message user-message">
                     <strong>You:</strong>
                     <div class="message-content">${userInput}</div>
                 </div>
             `;
-            
-            // Clear the input field
+
             document.getElementById("user_input").value = "";
 
-            // Show typing indicator
-            typingIndicator.style.display = "block";
+            // Show typing indicator where AI's message will be
+            let aiTypingMessage = document.createElement("div");
+            aiTypingMessage.className = "message bradley-message typing-indicator";
+            aiTypingMessage.innerHTML = `
+                <strong>Bradley:</strong> 
+                <div class="message-content">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            chatBox.innerHTML += aiTypingMessage.outerHTML;
+
+            chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // Send the request to FastAPI server
                 let response = await fetch("/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: new URLSearchParams({
                         "user_id": "user123", 
                         "user_input": userInput,
-                        "personality": "sarcastic"  // You can adjust this dynamically
+                        "personality": "sarcastic"
                     })
                 });
 
-                // Parse the response from the server
                 let data = await response.json();
-                
-                // Hide typing indicator once Bradley's response is ready
-                typingIndicator.style.display = "none";
 
-                // Append Bradley's response below the user's message
-                chatBox.innerHTML += ` 
-                    <div class="message bradley-message">
-                        <strong>Bradley:</strong>
-                        <div class="message-content">${data.ai_response}</div>
-                    </div>
+                // Remove the typing indicator
+                let typingIndicator = chatBox.querySelector('.typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+
+                // Append AI response as a new message
+                let aiMessage = document.createElement("div");
+                aiMessage.className = "message bradley-message ai-message"; // Added ai-message class
+                aiMessage.innerHTML = `
+                    <strong>Bradley:</strong>
+                    <div class="message-content">${data.ai_response}</div>
                 `;
+                chatBox.innerHTML += aiMessage.outerHTML;
 
-                // Scroll to the bottom of the chat box
-                chatBox.scrollTop = chatBox.scrollHeight;
+                // Scroll to the latest message smoothly
+                chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "smooth" });
+
             } catch (error) {
-                // Handle any errors
-                typingIndicator.style.display = "none";
+                // Remove typing indicator on error
+                let typingIndicator = chatBox.querySelector('.typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+
                 chatBox.innerHTML += `
                     <div class="message bradley-message">
                         <strong>Bradley:</strong>
@@ -104,8 +105,6 @@
             }
         }
     </script>
-
     {% endblock %}
-
 </body>
 </html>

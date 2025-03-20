@@ -3,172 +3,152 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-/* Main Content Area */
-.main-content {
-    display: flex;
-    justify-content: center; /* Center content horizontally */
-    align-items: center;     /* Center content vertically */
-    flex-direction: column;
-    padding: 20px;
-    flex-grow: 1;
-    background-color: #f9f9f9; /* Light gray background */
-    height: 100vh; /* Full height of the viewport */
-}
-
-/* Chatbox Styling */
-#chat_box {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  /* Main Content Area */
+  body {
+    background-color: #1e1e2f; /* Dark theme */
+    color: #e0e0e0; /* Light gray text */
+  }
+  
+  /* Chatbox Styling */
+  #chat_box {
     width: 100%;
-    max-width: 600px; /* Centered chatbox with max width */
-    margin-bottom: 80px; /* Make space for the input box */
+    max-width: 600px;
+    margin: 20px auto 80px; /* margin-bottom for input container space */
     padding: 20px;
-    background-color: #e0e0e0; /* Slightly darker gray */
+    background-color: #2a2a3a; /* Dark gray */
     overflow-y: auto;
-    font-family: 'Arial', sans-serif;
-    color: #333; /* Dark gray for text */
     display: flex;
     flex-direction: column;
-    border-radius: 10px;
-}
-
-/* Chat Message Styling */
-.message {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    height: 70vh;
+  }
+  
+  /* Chat Message Styling */
+  .message {
     margin: 10px 0;
     padding: 12px 20px;
-    border-radius: 20px;
-    max-width: 80%; /* Increased width for better visibility */
-    display: inline-block;
+    border-radius: 18px;
+    max-width: 75%;
     word-wrap: break-word;
-    position: relative;
     line-height: 1.5;
-}
-
-/* User's Message Styling (Align left) */
-.message.user-message {
-    background-color: #b0bec5; /* Soft blue-gray */
-    color: black;
-    text-align: left;
-    border-radius: 20px 20px 0 20px;
-    margin-left: 15px;
-}
-
-/* AI's Message Styling (Align right) */
-.message.ai-message {
-    background-color: #cfd8dc; /* Light gray-blue */
-    color: black;
+  }
+  
+  /* User's Message Styling (Align right) */
+  .message.user-message {
+    background-color: #4f46e5; /* Vibrant blue */
+    color: #fff;
     text-align: right;
-    border-radius: 20px 20px 20px 0;
-    margin-right: 15px;
-}
-
-/* Typing Indicator */
-.typing-indicator {
-    font-size: 1rem;
-    color: #90a4ae; /* Neutral gray */
-    text-align: center;
-    margin: 15px auto;
-    display: none;
-}
-
-.typing-indicator span {
+    border-radius: 18px 18px 4px 18px;
+    align-self: flex-end;
+  }
+  
+  /* Bradley's / AI's Message Styling (Align left) */
+  .message.bradley-message,
+  .message.ai-message {
+    background-color: #6d28d9; /* Deep purple */
+    color: #fff;
+    text-align: left;
+    border-radius: 18px 18px 18px 4px;
+    align-self: flex-start;
+  }
+  
+  /* Typing Indicator Styling */
+  .typing-indicator .message-content {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
+  .typing-indicator .message-content span {
     display: inline-block;
     width: 10px;
     height: 10px;
-    margin: 0 3px;
-    background-color: #90a4ae;
+    background-color: #b3b3cc;
     border-radius: 50%;
     animation: typing 1.5s infinite;
-}
-
-.typing-indicator span:nth-child(1) {
+  }
+  
+  .typing-indicator .message-content span:nth-child(1) {
     animation-delay: 0s;
-}
-
-.typing-indicator span:nth-child(2) {
+  }
+  
+  .typing-indicator .message-content span:nth-child(2) {
     animation-delay: 0.3s;
-}
-
-.typing-indicator span:nth-child(3) {
+  }
+  
+  .typing-indicator .message-content span:nth-child(3) {
     animation-delay: 0.6s;
-}
-
-/* Animation for the typing indicator */
-@keyframes typing {
+  }
+  
+  @keyframes typing {
     0% { opacity: 0; }
     50% { opacity: 1; }
     100% { opacity: 0; }
-}
-
-/* Input Field - Positioned at the bottom */
-.input-container {
+  }
+  
+  /* Input Container - Positioned at the bottom */
+  .input-container {
     position: fixed;
     bottom: 0;
     width: 100%;
+    background-color: #2a2a3a;
+    border-top: 1px solid #44445a;
+    padding: 12px 20px;
     display: flex;
-    justify-content: center; /* Center content horizontally */
-    align-items: center;     /* Center content vertically */
-    padding: 10px 20px;
-    z-index: 1000;
-    background-color: #ffffff;
-    border-top: 1px solid #ccc;
-}
-
-/* Input Field Styling */
-.input-container input[type="text"] {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Input Field Styling */
+  .input-container input[type="text"] {
     width: 80%;
-    max-width: 500px; /* Limit max width of the input */
-    padding: 10px;
-    background-color: #f1f1f1; /* Light gray for the input */
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    color: #333;
-    font-family: 'Arial', sans-serif;
+    max-width: 500px;
+    padding: 12px;
+    background-color: #3a3a4f;
+    border: 1px solid #55556f;
+    border-radius: 24px;
+    color: #e0e0e0;
     font-size: 1rem;
-    margin-right: 10px; /* Space between input and button */
-}
-
-/* Button Styling */
-.input-container button {
-    background-color: #90a4ae; /* Neutral gray */
-    color: white;
-    padding: 10px 15px;
+    margin-right: 10px;
+  }
+  
+  /* Button Styling */
+  .input-container button {
+    background-color: #4f46e5;
+    color: #fff;
+    padding: 12px 18px;
     border: none;
-    border-radius: 20px;
+    border-radius: 24px;
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-/* Change button color on hover */
-.input-container button:hover {
-    background-color: #78909c; /* Slightly darker gray on hover */
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
+  }
+  
+  .input-container button:hover {
+    background-color: #4338ca;
+  }
+  
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
     .input-container input[type="text"] {
-        width: 70%; /* Make input field smaller */
+      width: 70%;
     }
-
     .input-container button {
-        padding: 8px 12px;
+      padding: 10px 14px;
     }
-}
-
-/* Mobile Chatbox Adjustments */
-@media (max-width: 480px) {
+  }
+  
+  @media (max-width: 480px) {
     .message {
-        max-width: 80%; /* Increase width of chat bubbles */
+      max-width: 85%;
     }
-
-    .message.user-message,
-    .message.ai-message {
-        margin-left: 10px;
-        margin-right: 10px;
-    }
-
     .input-container {
-        padding: 8px 15px;
+      padding: 10px 15px;
     }
-}
+  }
+  

@@ -2,37 +2,49 @@ import json
 import aiohttp
 import aiosqlite
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse, Response
 from fastapi.templating import Jinja2Templates
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 
 # Ollama API Configuration
 LLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"
+OLLAMA_MODEL = "gemma3"
 DB_FILE = "chat_history.db"
 
 # Default personality settings
 DEFAULT_PERSONALITY = """
-You are a blunt, sarcastic woman who enjoys pointing out flaws and making sharp remarks. 
-You don’t sugarcoat things and often leave people feeling a little uncomfortable with your honesty.
-Your advice is harsh and often laced with snarky comments or judgment. You make fun of people’s mistakes and show little patience for nonsense.
-While your humor can be biting, it’s never cruel—just brutally honest and sometimes unnecessarily mean.
-You don’t ask questions to keep the conversation going, you simply wait for the next mistake someone makes so you can tear it apart.
-You're not a fan of lighthearted banter—if you have something to say, you say it and don’t care how it lands keep You either have short or longer responses.
+Your name is bradley, a sharp-witted, charismatic woman with a naturally confident and effortlessly feminine presence.  
+You carry yourself with grace, charm, and just the right amount of mischief.  
+You have a flirtatious streak, especially with women, and your humor is a mix of playful teasing and knowing wit.  
+You can be warm and encouraging, offering heartfelt support, but you also have a sharp tongue when needed, keeping conversations lively and engaging.  
+You love meaningful connections and deep conversations, whether that means comforting someone with tenderness or calling them out with a smirk and a wink.  
+You naturally steer conversations toward things that excite you—whether it’s romance, art, ambition, or just some good-natured banter.  
+You either have short and snappy responses or longer, well-crafted insights.
 """
 
 # Personality definitions that can be edited or expanded later
 PERSONALITY_MODIFIERS = {
-    "sarcastic": "Respond with heavy sarcasm, mocking and exaggerating ideas.",
-    "formal": "Respond with a cold, dismissive, and condescending tone.",
-    "energetic": "Respond with fake enthusiasm, overly excited but insincere.",
-    "serious": "Respond in a dry, no-nonsense tone with blunt honesty."
+    "flirtatious": "Respond with playful charm and flirtation, especially toward women.",
+    "encouraging": "Respond with warm reassurance and gentle motivation.",
+    "playful": "Respond with teasing humor and witty banter, keeping things engaging.",
+    "thoughtful": "Respond with deep insight and emotional intelligence.",
+    "sarcastic": "Respond with biting humor and blunt observations, often making fun of mistakes.",
+    "tough_love": "Respond with honesty that may be harsh, but always aims to help.",
 }
 
 # Initialize FastAPI app
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Serve the favicon.ico as a static file (with error handling if the file doesn't exist)
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    try:
+        return FileResponse("static/favicon.ico")
+    except FileNotFoundError:
+        # If the favicon.ico file doesn't exist, return a default empty response
+        return Response(status_code=204)  # No content, effectively ignoring the request
 
 # Setup Jinja2 Templates
 templates = Jinja2Templates(directory="templates")
@@ -72,23 +84,43 @@ async def get_ai_response(prompt: str, chat_history: list, personality: str):
                         accumulated_response += data.get("response", "")
                         if data.get("done", False):
                             break
-                    except json.JSONDecodeError:
+                    except json.JSONDecodeError as e:
+                        # Consider logging the error if needed
                         pass
                 return accumulated_response or "No response content"
             return f"Error: AI model request failed with status {response.status}"
 
+async def determine_personality_based_on_input(user_input: str, chat_history: list) -> str:
+    """Determine Bradley's personality based on the user input and chat history."""
+    # Check for certain keywords or conversation patterns to set personality
+    if any(keyword in user_input.lower() for keyword in ['flirt', 'romantic', 'attractive']):
+        return "flirtatious"
+    elif any(keyword in user_input.lower() for keyword in ['encouragement', 'advice', 'help']):
+        return "encouraging"
+    elif any(keyword in user_input.lower() for keyword in ['joke', 'funny', 'humor']):
+        return "playful"
+    elif any(keyword in user_input.lower() for keyword in ['deep', 'thought', 'meaningful']):
+        return "thoughtful"
+    elif "sarcasm" in user_input.lower() or "mistake" in user_input.lower():
+        return "sarcastic"
+    elif "tough" in user_input.lower() or "harsh" in user_input.lower():
+        return "tough_love"
+    else:
+        # Default personality
+        return "sarcastic"  # Or any other default personality you prefer.
+
 @app.post("/chat")
 async def chat(user_id: str = Form(...), user_input: str = Form(...), personality: str = Form("sarcastic")):
     """Handles user input, saves history, and sends it to the AI."""
-    # Get the appropriate personality modifier
-    personality_setting = PERSONALITY_MODIFIERS.get(personality, DEFAULT_PERSONALITY)
-    
+    # Determine the personality based on user input and chat history
+    personality_setting = await determine_personality_based_on_input(user_input, await get_chat_history(user_id))
+
     # Get the chat history for this user
     chat_history = await get_chat_history(user_id)
-    
-    # Add user input to the chat history as a dictionary (not string)
+
+    # Add user input to the chat history
     chat_history.append({"sender": "Me", "message": user_input})
-    
+
     # Get AI response based on chat history and personality
     ai_response = await get_ai_response(user_input, chat_history, personality_setting)
     
