@@ -18,7 +18,7 @@
         {% for msg in chat_history %}
             <div class="message {% if msg.sender == 'Me' %}user-message{% else %}bradley-message{% endif %}">
                 <strong>{% if msg.sender == 'Me' %}You:{% else %}Bradley:{% endif %}</strong>
-                <div class="message-content">{{ msg.message }}</div>
+                <div class="message-content">{{ msg.message | safe }}</div>
             </div>
         {% endfor %}
     </div>
@@ -31,15 +31,23 @@
     </form>
 
     <script>
+        function formatActionText(text) {
+            // Convert *action* text into HTML with <span class="action"> for styling
+            return text.replace(/\*(.*?)\*/g, '<span class="action">$1</span>');
+        }
+
         async function sendMessage() {
             let userInput = document.getElementById("user_input").value;
             let chatBox = document.getElementById("chat_box");
+
+            // Format user's input text
+            let formattedUserInput = formatActionText(userInput);
 
             // Display user's message
             chatBox.innerHTML += ` 
                 <div class="message user-message">
                     <strong>You:</strong>
-                    <div class="message-content">${userInput}</div>
+                    <div class="message-content">${formattedUserInput}</div>
                 </div>
             `;
 
@@ -77,12 +85,13 @@
                     typingIndicator.remove();
                 }
 
-                // Append AI response as a new message
+                // Format AI response and display it
+                let formattedAiResponse = formatActionText(data.ai_response);
                 let aiMessage = document.createElement("div");
-                aiMessage.className = "message bradley-message ai-message"; // Added ai-message class
+                aiMessage.className = "message bradley-message ai-message";
                 aiMessage.innerHTML = `
                     <strong>Bradley:</strong>
-                    <div class="message-content">${data.ai_response}</div>
+                    <div class="message-content">${formattedAiResponse}</div>
                 `;
                 chatBox.innerHTML += aiMessage.outerHTML;
 

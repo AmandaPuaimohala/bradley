@@ -151,4 +151,7 @@
       padding: 10px 15px;
     }
   }
-  
+  .action {
+    font-style: italic;
+    color: #ffffff; /* Optional: You can change this color to suit your design */
+}
